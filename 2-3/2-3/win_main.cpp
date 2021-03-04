@@ -1,5 +1,4 @@
-//p39
-//오류시 '링커-시스템-하위시스템-창'으로 변경
+//p58 실습 2-3 DrawText() 함수 이용하기
 #include <windows.h>
 #include <tchar.h>
 
@@ -37,10 +36,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	return (int)msg.wParam;
 }
 
+
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) {
-	switch (iMsg)
-	{
+	HDC hdc;
+	PAINTSTRUCT ps;
+	RECT rect;
+
+	switch (iMsg) {
 	case WM_CREATE:
+		break;
+	case WM_PAINT:
+		hdc = BeginPaint(hwnd, &ps);
+		rect.left = 50;
+		rect.top = 40;
+		rect.right = 200;
+		rect.bottom = 120;
+		DrawText(hdc, _T("HelloWorld"), 10, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+		EndPaint(hwnd, &ps);
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
