@@ -1,13 +1,17 @@
 //p232 6-1대화상자 만들기, p239 6-2버튼 컨트롤 이용하기, p242 6-3버튼 컨트롤 활상화&비활성화하기
+//p253 6-4에디트 컨트롤에 문자열 복사하기, p256 6-5체크박스와 라디오 버튼 이용
 
 #include <Windows.h>
 #include <tchar.h>
+#include <stdio.h>
 #include"resource.h"
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK Dlg6_1Proc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK Dlg6_2Proc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK Dlg6_3Proc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK Dlg6_4Proc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK Dlg6_5Proc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam);
 
 HINSTANCE g_hinst;
 
@@ -61,6 +65,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) {
 			break;
 		case ID_6_3_MENU:
 			DialogBox(g_hinst, MAKEINTRESOURCE(IDD_DIALOG6_3), hwnd, Dlg6_3Proc);
+			break;
+		case ID_6_4_MENU:
+			DialogBox(g_hinst, MAKEINTRESOURCE(IDD_DIALOG6_4), hwnd, Dlg6_4Proc);
+			break;
+		case ID_6_5_MENU:
+			DialogBox(g_hinst, MAKEINTRESOURCE(IDD_DIALOG6_5), hwnd, Dlg6_5Proc);
 			break;
 		}
 		break;
@@ -116,6 +126,7 @@ BOOL CALLBACK Dlg6_2Proc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam) {
 	return 0;
 }
 
+//p255 엔터처리? 차라리 키다운?
 BOOL CALLBACK Dlg6_3Proc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam) {
 	HWND hButton;
 		switch (iMsg) {
@@ -146,5 +157,77 @@ BOOL CALLBACK Dlg6_3Proc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam) {
 			}
 			break;
 		}
+	return 0;
+}
+
+BOOL CALLBACK Dlg6_4Proc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam) {
+	TCHAR word[100];
+
+	switch (iMsg) {
+	case WM_INITDIALOG:
+		return 1;
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case ID_BUTTON_COPY:
+			GetDlgItemText(hDlg, IDC_EDIT_SOURCE, word, 100);
+			SetDlgItemText(hDlg, IDC_EDIT_COPY, word);
+			break;
+		case ID_BUTTON_CLEAR:
+			SetDlgItemText(hDlg, IDC_EDIT_COPY, _T(""));
+			SetDlgItemText(hDlg, IDC_EDIT_COPY, _T(""));
+			break;
+		case ID_BUTTON_END:
+			EndDialog(hDlg, 0);
+			break;
+		case IDCANCEL:
+			EndDialog(hDlg, 0);
+			break;
+		}
+		break;
+	}
+	return 0;
+}
+
+BOOL CALLBACK Dlg6_5Proc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam) {
+	static int Check[3], Radio;
+	TCHAR hobby[][30] = { _T("독서"), _T("음악감상"), _T("인터넷") };
+	TCHAR sex[][30] = { _T("여자"), _T("남자") };
+	TCHAR output[200];
+
+	switch (iMsg) {
+	case WM_INITDIALOG:
+		CheckRadioButton(hDlg, IDC_RADIO_MALE, IDC_RADIO_FEMALE, IDC_RADIO_MALE);
+		return 1;
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDC_CHECK_READING:
+			Check[0] = 1 - Check[0];
+			break;
+		case IDC_CHECK_MUSIC:
+			Check[1] = 1 - Check[1];
+			break;
+		case IDC_CHECK_INTERNET:
+			Check[2] = 1 - Check[2];
+			break;
+		case IDC_RADIO_FEMALE:
+			Radio = 0;
+			break;
+		case IDC_RADIO_MALE:
+			Radio = 1;
+			break;
+		case IDC_BUTTON_OUTPUT:
+			_stprintf_s(output, _T("선택한 취미는 %s %s %s 입니다.\r\n")_T("선택한 성별은 %s입니다."), Check[0] ? hobby[0] : _T(""), Check[1] ? hobby[1] : _T(""), Check[2]
+				? hobby[2] : _T(""), sex[Radio]);
+			SetDlgItemText(hDlg, IDC_EDIT_OUTPUT, output);
+			break;
+		case IDC_BUTTON_CLOSE:
+			EndDialog(hDlg, 0);
+			break;
+		case IDCANCEL:
+			EndDialog(hDlg, 0);
+			break;
+		}
+		break;
+	}
 	return 0;
 }
